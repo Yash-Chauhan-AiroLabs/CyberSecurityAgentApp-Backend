@@ -7,3 +7,9 @@ __pycache__/
 
 # .env
 .env
+
+# Database files
+*.db
+
+# Logs
+*.log
