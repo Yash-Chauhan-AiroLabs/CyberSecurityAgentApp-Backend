@@ -241,6 +241,17 @@ class GroqService:
                 max_completion_tokens=4000,
             )
             fixed_code = response.choices[0].message.content.strip()
+            
+            # Clean markdown if present
+            if fixed_code.startswith('```python'):
+                fixed_code = fixed_code[9:]
+            if fixed_code.startswith('```'):
+                fixed_code = fixed_code[3:]
+            if fixed_code.endswith('```'):
+                fixed_code = fixed_code[:-3]
+                
+            fixed_code.strip()
+        
         except Exception as e:
             logger.exception("Fix file LLM call failed")
             return f"❌ Failed to fix file {file_path}. Please try again."
