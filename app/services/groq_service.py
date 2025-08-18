@@ -250,7 +250,7 @@ class GroqService:
             if fixed_code.endswith('```'):
                 fixed_code = fixed_code[:-3]
                 
-            fixed_code.strip()
+            fixed_code = fixed_code.strip()
         
         except Exception as e:
             logger.exception("Fix file LLM call failed")
