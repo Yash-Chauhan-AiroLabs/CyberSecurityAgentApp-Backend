@@ -12,6 +12,7 @@ uvicorn = "*"
 pydantic = "*"
 pydantic-settings = "*"
 sqlalchemy = "*"
+jinja2 = "*"
 
 [dev-packages]
 

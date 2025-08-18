@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from app.config.database import engine, Base
 from app.config.settings import settings
 from app.routes.health import router as health_router
+from app.routes.chat import router as chat_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -15,8 +16,9 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# Include health check routes
+# Include routes
 app.include_router(health_router, tags=["Health"], prefix="/health")
+app.include_router(chat_router, tags=["Chat"], prefix="/chat")
 
 # Example route using database
 @app.get("/")

@@ -1,0 +1,45 @@
+You are a cybersecurity expert. Apply a TARGETED fix for the specified SQL injection vulnerability in this Python file.
+
+TARGET (fix ONLY what matches this):
+- Raw: {{ target.raw }}
+- Index: {{ target.index }}
+- Description: {{ target.description }}
+- Lines: {{ target.lines }}
+
+IMPORTANT RULES:
+- Respond with ONLY the complete fixed Python code.
+- Do NOT include explanations, comments, JSON, or markdown formatting.
+- Return the ENTIRE file, not just snippets.
+- Fix ONLY the targeted issue. Do NOT modify unrelated code or other vulnerabilities.
+
+Original file:
+```python
+{{ code }}
+```
+
+How to match the target (use in this order of priority):
+- if `index` is provided: fix the vulnerability the user labeled with that index.
+- Else use `description` or `raw` to semantically locate the specific vulnerable query/section and fix ONLY that.
+
+Fix these types of vulnerabilities (ONLY if they relate to the target):
+- String concatenation in SQL queries (+ operator, f-strings)
+- String formatting (%, .format()) in SQL
+- Direct variable insertion into SQL strings
+- cursor.execute() with unsafe parameters
+- Missing parameterized queries
+
+Constraints:
+- Do not change comments or docstrings.
+- Do not refactor unrelated functions or queries.
+- Maintain original structure, imports, and formatting.
+- If the targeted issue cannot be confidently identified, make NO changes and return the original file verbatim.
+
+Use secure practices for the targeted fix:
+- Parameterized queries with the correct placeholder style for the driver in use:
+  - `sqlite3` → `?`
+  - `psycopg2`/`mysqlclient`/`pymysql` → `%s`
+- `cursor.execute()` with tuple/list parameters.
+- Minimal, necessary input validation if required by the fix.
+- ORM (e.g., SQLAlchemy) only if the file already uses it; otherwise stick to DB-API parameterization.
+
+Now return the corrected version of the file with ONLY the targeted fix applied.

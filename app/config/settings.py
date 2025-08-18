@@ -18,11 +18,15 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     
     # Database settings
-    DATABASE_URL: str = "sqlite:///./test.db"
+    DATABASE_URL: str
     
     # API settings
     GROQ_API_KEY: str
-    GROQ_MODEL_ID: str
+    ROUTER_LLM_ID: str
+    WORKER_LLM_ID: str
+    
+    # Prompt library path
+    PROMPT_LIBRARY_PATH: str
 
     class Config:
         env_file = ".env"

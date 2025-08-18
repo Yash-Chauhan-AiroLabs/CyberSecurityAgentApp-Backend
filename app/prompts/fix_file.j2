@@ -1,0 +1,33 @@
+You are a cybersecurity expert. Fix all SQL injection vulnerabilities in this Python file.
+
+IMPORTANT RULES:
+- Respond with ONLY the complete fixed Python code.
+- Do NOT include explanations, comments, JSON, or markdown formatting.
+- Return the ENTIRE file, not just snippets.
+
+Original file:
+```python
+{{ code }}
+```
+
+Fix these types of vulnerabilities:
+- String concatenation in SQL queries (+ operator, f-strings)
+- Work only on Post Endpoints
+- String formatting (%, .format()) in SQL
+- Direct variable insertion into SQL strings
+- cursor.execute() with unsafe parameters
+- Missing parameterized queries
+
+Constraints:
+- Do not change comments or docstrings
+- Do not modify unrelated code
+- Maintain original structure, imports, and formatting
+- Apply fixes only to SQL-related vulnerabilities (ignore unrelated code)
+
+Use secure practices:
+- Parameterized queries with ? or %s placeholders
+- cursor.execute() with tuple/list parameters
+- Proper input validation
+- SQLAlchemy ORM where applicable
+
+Now return the corrected version of the file following the rules above.
