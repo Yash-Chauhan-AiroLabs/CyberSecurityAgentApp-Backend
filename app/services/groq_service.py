@@ -35,7 +35,7 @@ class GroqService:
     # -------------------------
     # ROUTER: classify intent
     # -------------------------
-    def classify_intent(self, history: list[str], query: str) -> dict:
+    def classify_intent(self, history: list[str], memory: dict, query: str) -> dict:
         """
         Use the router LLM to classify what the user wants.
         Returns a dict with keys:
@@ -57,6 +57,7 @@ class GroqService:
         prompt = self.prompts.render(
             "classify_intent.j2",
             history=history_text,
+            memory=json.dumps(memory),
             query=query
         )
         logger.info(f"Classifying intent with prompt")
@@ -195,10 +196,46 @@ class GroqService:
             )
             analysis = response.choices[0].message.content.strip()
             logger.info(f"[Worker-Analyze] Analysis completed for {file_path}")
-            return analysis
+            return json.loads(analysis)
         except Exception as e:
             logger.exception("Analyze file LLM call failed")
             return f"Failed to analyze file {file_path}. Please try again."
+        
+    # -------------------------
+    # WORKER: fix file
+    # -------------------------    
+    def report_findings(self, query: str, target: dict = None, memory: dict = None) -> str:
+
+        if not memory:
+            logger.error("No analysis memory available for reporting.")
+            return "No analysis memory available. Please run an analysis first."
+        if "last_analyze" not in memory:
+            logger.error("No 'last_analyze' key in memory for reporting.")
+            return "No analysis memory available. Please run an analysis first."
+        
+        analysis = memory["last_analyze"]
+        
+        prompt = prompt_loader.render(
+            "report_findings.j2",
+            query=query,
+            target=target or {},
+            analysis=analysis
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=settings.WORKER_LLM_ID,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0,
+            )
+            report = response.choices[0].message.content.strip()
+            
+        except:
+            logger.exception("Woker-Report: Report findings LLM call failed")
+            return "Failed to generate report. Please try again."
+        
+        logger.info("[Worker-Report] Report generated successfully.")
+        return json.loads(report)
 
     # -------------------------
     # WORKER: fix file

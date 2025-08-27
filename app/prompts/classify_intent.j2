@@ -7,24 +7,30 @@ Conversation history:
 Latest query:
 {{ query }}
 
+Memory:
+{{ memory }}
+
 Follow these rules:
 1. Always classify the user's intent as one of:
    - "general" → general chatbot question not tied to files
    - "analyze" → user wants to analyze a file for vulnerabilities
+   - "report" → user wants a report of past analyses, no fixes, just info, filters may apply
    - "fix_all" → user wants to fix all vulnerabilities in a file
    - "fix_partial" → user wants to fix a specific vulnerability
-2. Always include "file_path" if a file is mentioned or implied from context. Otherwise null.
-3. Always include a "target" object:
+2. If we have memory about analyses, don't classify as "analyze".
+3. Only classify as report if we have memory about analyses.
+3. Always include "file_path" if a file is mentioned or implied from context. Otherwise null.
+4. Always include a "target" object:
    - "raw" → always echo the user's exact phrasing if fix_partial, else null
    - "index" → issue number (integer) if user referred to 1st/2nd/3rd/etc, else null
    - "description" → short text if user mentioned the type of issue (e.g. f-string, SQL concat), else null
    - "lines" → list of line numbers if user explicitly mentioned them, else null
-4. Reply ONLY with valid JSON. No extra text.
-5. Pay extra attention to the user's intent when classifying to fix_all and fix_partial, if the user never explicitly ask to fix anythying classify it as general.
+5. Reply ONLY with valid JSON. No extra text.
+6. Pay extra attention to the user's intent when classifying to fix_all and fix_partial, if the user never explicitly ask to fix anythying classify it as general.
    - if the user asks to fix a specific issue, classify as fix_partial
    - if the user asks to fix everything or just fix the file, classify as fix_all
    - if user ask suggestions on how to fix or general questions about vulnerabilities, classify as general
-6. If user ask suggestions on how to fix something, classify as general
+7. If user ask suggestions on how to fix something, classify as general
 
 ---
 
@@ -48,7 +54,23 @@ Output:
 }
 
 ---
+1. User: Analyze app/routes.py
+2. Assistant: Found 5 issues
+Latest query: Show me the high severity ones
 
+Output:
+{
+  "intent": "report",
+  "file_path": "app/routes.py",
+  "target": {
+    "raw": "high severity ones",
+    "index": null,
+    "description": null,
+    "lines": null
+  }
+}
+
+---
 History:
 1. User: Can you Analyze app/db.py for me?
 2. Assistant: Found multiple vulnerabilities
