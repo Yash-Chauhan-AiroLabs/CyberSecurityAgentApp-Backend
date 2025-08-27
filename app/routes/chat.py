@@ -5,6 +5,7 @@ from app.services.groq_service import groq_service
 from app.services.executor import executor_service
 from app.config.history import history_manager
 from app.config.logger import logger
+import json
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 # Router Instance
@@ -37,13 +38,15 @@ async def chat_endpoint(req: ChatRequest):
             history=history
         )
 
+        logger.info(f"Response: {response_text}")
+        
         # 4. Save messages into history
         history_manager.add(req.session_id, "user", req.message)
         history_manager.add(req.session_id, "assistant", response_text)
 
         # 5. Return response
         return ChatResponse(
-            response=response_text,
+            response=json.loads(response_text),
             intent=classification["intent"],
             file_path=classification["file_path"],
             target=classification.get("target"),
