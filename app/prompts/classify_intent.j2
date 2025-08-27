@@ -109,6 +109,25 @@ Output:
 ---
 
 History:
+1. User: Can you Analyze app/db.py for me?
+2. Assistant: Found multiple vulnerabilities
+Latest query: show me how to fix vulnerability number 3
+
+Output:
+{
+  "intent": "general",
+  "file_path": napp/db.py,
+  "target": {
+    "raw": null,
+    "index": null,
+    "description": null,
+    "lines": null
+  }
+}
+
+---
+
+History:
 1. User: What is SQL injection?
 Latest query: Tell me more about it
 
