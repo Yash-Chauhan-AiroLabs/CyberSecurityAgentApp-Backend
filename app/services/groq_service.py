@@ -59,7 +59,7 @@ class GroqService:
             history=history_text,
             query=query
         )
-        logger.info(f"Classifying intent with prompt: {prompt}")
+        logger.info(f"Classifying intent with prompt")
 
         try:
             response = self.client.chat.completions.create(

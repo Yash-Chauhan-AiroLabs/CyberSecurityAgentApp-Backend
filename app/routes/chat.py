@@ -1,25 +1,14 @@
 # app/routes/chat.py
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from app.db.schemas import ChatRequest, ChatResponse
 from app.services.groq_service import groq_service
 from app.services.executor import executor_service
 from app.config.history import history_manager
 from app.config.logger import logger
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
+# Router Instance
 router = APIRouter()
-
-# ---------- Request/Response Models ----------
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
-
-class ChatResponse(BaseModel):
-    response: str
-    intent: str
-    file_path: str | None = None
-    target: dict | None = None
-
 
 # ---------- Route ----------
 @router.post("/chat", response_model=ChatResponse)
