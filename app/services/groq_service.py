@@ -31,6 +31,34 @@ class GroqService:
         
         self.prompts = prompt_loader
         logger.info(f"Prompt Loader initialized.")
+        
+    # -------------------------
+    # PATH NORMALIZATION
+    # -------------------------
+    def normalize_path(self, file_path: str) -> str | None:
+        """
+        Convert host paths returned by LLM to container-accessible paths.
+        Maps / -> /host/ if necessary.
+        """
+        if not file_path:
+            return None
+        
+        path = Path(file_path)
+
+        # If path exists as-is in container, return
+        if path.exists():
+            return str(path)
+
+        # Map host path to /host
+        try:
+            host_path = Path("/host") / path.relative_to("/")
+            if host_path.exists():
+                return str(host_path)
+            else:
+                # Return mapped path anyway (may fail later)
+                return str(host_path)
+        except Exception:
+            return str(path)
 
     # -------------------------
     # ROUTER: classify intent
@@ -122,6 +150,8 @@ class GroqService:
         parsed["target"].setdefault("description", None)
         parsed["target"].setdefault("lines", None)
 
+        # Normalize path for Docker
+        parsed["file_path"] = self.normalize_path(parsed.get("file_path"))
         logger.info(f"[Router] Classified intent: {parsed}")
         return parsed
             
@@ -136,6 +166,7 @@ class GroqService:
 
         file_code = None
         if file_path:
+            file_path = self.normalize_path(file_path)
             try:
                 path = Path(file_path)
                 if path.exists():
@@ -171,6 +202,7 @@ class GroqService:
     # WORKER: analyze file
     # -------------------------
     def analyze_file(self, file_path: str) -> str:
+        file_path = self.normalize_path(file_path)
         path = Path(file_path)
         if not path.exists():
             logger.error(f"File not found: {file_path}")
@@ -202,7 +234,7 @@ class GroqService:
             return f"Failed to analyze file {file_path}. Please try again."
         
     # -------------------------
-    # WORKER: fix file
+    # WORKER: Report Findings
     # -------------------------    
     def report_findings(self, query: str, target: dict = None, memory: dict = None) -> str:
 
@@ -241,6 +273,7 @@ class GroqService:
     # WORKER: fix file
     # -------------------------
     def fix_file(self, file_path: str, target: dict = None) -> str:
+        file_path = self.normalize_path(file_path)
         path = Path(file_path)
         if not path.exists():
             logger.error(f"File not found: {file_path}")

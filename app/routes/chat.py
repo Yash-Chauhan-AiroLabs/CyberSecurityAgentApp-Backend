@@ -45,7 +45,7 @@ async def chat_endpoint(req: ChatRequest):
 
         logger.info(f"Response Type: {type(response)}")
         
-        if classification["intent"] == "analyze" or classification["intent"] == "report":
+        if isinstance(response, dict) and (classification["intent"] == "analyze" or classification["intent"] == "report"):
             
             # Save user message into history
             logger.info(f'History update for analyze: {req.session_id}')
