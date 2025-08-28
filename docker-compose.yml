@@ -1,0 +1,10 @@
+services:
+  fastapi:
+    build: .
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - /:/host  # Mount entire host filesystem into /host inside container
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    privileged: true  # Gives extra permissions for system-wide access
